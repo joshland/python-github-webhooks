@@ -12,4 +12,4 @@ class ScriptNameStripper(object):
         return self.app(environ, start_response)
 
 if __name__ == '__main__':
-    WSGIServer(ScriptNameStripper(application)).run()
+    WSGIServer(ScriptNameStripper(application), bindAddress='/tmp/webhooks.sock').run()
