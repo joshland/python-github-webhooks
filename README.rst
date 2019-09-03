@@ -2,6 +2,24 @@
 Python GitHub Webhooks
 ======================
 
+This is the TDT4120 fork of the
+carlos-jenkins/python-github-webhooks.git repository. We use this to
+support git pulls triggered by webhooks. This forked repository
+contains a number of changes compared to the original and,
+additionally, it allows us to maintain our custom hook scripts
+alongside the webhook handler. This makes sense given the relative
+simplicity of the webhook handler. The changes to the code are as follows:
+
+ * All packages pumped to their most recent versions
+ * Added Pipfile, allowing usage within a pipenv-managed virtualenv
+ * Added fcgi handlers since we are stuck with lighttpd which doesn't
+   support WSGI
+   Based on:
+   https://flask.palletsprojects.com/en/1.1.x/deploying/fastcgi/
+ * Added a default configuration file
+
+The original README proceeds below:
+
 Simple Python WSGI application to handle GitHub webhooks.
 
 
