@@ -1,0 +1,5 @@
+#!/bin/sh
+
+echo "Hook finished successfully"
+
+echo "push" >> /tmp/pushdata
