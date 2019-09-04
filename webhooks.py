@@ -100,14 +100,21 @@ def index():
     if event == 'ping':
         return dumps({'msg': 'pong'})
 
-    # Gather data
-    try:
-        payload = request.get_json()
-        if payload is None:
-            raise Exception
-    except Exception:
-        logging.warning('Request parsing failed')
+    if not request.is_json:
+        abort(415)
+
+    payload = request.get_json()
+
+    if payload is None:
         abort(400)
+    # Gather data
+    # try:
+
+    #     if payload is None:
+    #         raise Exception
+    # except Exception:
+    #     logging.warning('Request parsing failed')
+    #     abort(400)
 
     # Determining the branch is tricky, as it only appears for certain event
     # types an at different levels
