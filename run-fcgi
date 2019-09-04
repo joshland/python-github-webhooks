@@ -1,3 +1,5 @@
 #!/bin/sh
 
-pipenv run fcgi
+# exec 2>&1 > /tmp/output
+
+exec pipenv run fcgi $@
