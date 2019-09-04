@@ -15,4 +15,4 @@ flup = ">=1.0.3"
 python_version = "3.6"
 
 [scripts]
-fcgi = "python webhooks.fcgi"
+fcgi = "python3 webhooks.fcgi"
