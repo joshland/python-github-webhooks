@@ -103,6 +103,8 @@ def index():
     # Gather data
     try:
         payload = request.get_json()
+        if payload is None:
+            raise Exception
     except Exception:
         logging.warning('Request parsing failed')
         abort(400)
@@ -129,9 +131,7 @@ def index():
             branch = payload['ref'].split('/', 2)[2]
 
     except KeyError:
-        # If the payload structure isn't what we expect, we'll live without
-        # the branch name
-        pass
+        abort(400)
 
     # All current events have a repository, but some legacy events do not,
     # so let's be safe
@@ -143,6 +143,11 @@ def index():
         'event': event
     }
     logging.info('Metadata:\n{}'.format(dumps(meta)))
+
+
+    # Valid payloads contain the 'deleted' key
+    if not 'deleted' in payload:
+        abort(400)
 
     # Skip push-delete
     if event == 'push' and payload['deleted']:
