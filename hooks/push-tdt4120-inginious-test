@@ -1,0 +1,53 @@
+#!/bin/bash
+set -euo pipefail
+
+# Set the name of the branch that we should keep in sync
+branch="test"
+
+# Path to the repository
+repopath="/var/www/repotest/tdt4120-inginious"
+
+s=`mktemp`
+t=`mktemp`
+
+trap send_mail ERR
+trap cleanup EXIT
+
+git="git -C ${repopath}"
+
+send_mail() {
+    # If our pull --rebase fails we may have started a merge. Abort
+    # this.
+    ($git rebase --abort || true) > /dev/null 2>&1
+
+    # OSticket needs some HTML help in order to show preformatted text
+    # correctly
+    cat << EOF > $s
+<pre style="font-family: monospace">
+Git pull command on inginious server failed
+
+This means that the latest assignment updates may not be present on
+the production system. Please attend to this matter urgently.
+
+
+See output below:
+
+EOF
+    echo "</pre>" >> $t
+    cat $s $t | mail -c '' -s 'git pull on server failed'             \
+                     -r www-data@bergen.idi.ntnu.no                   \
+                     -a "Cc: truls.asheim@ntnu.no"                    \
+                     -a "Content-Type: text/html; charset=\"UTF-8\""  \
+                     -- algdat@idi.ntnu.no
+}
+
+cleanup() {
+    rm $s $t
+}
+
+# Ensure that our branch hasn't diverged from origin before pulling
+stdbuf -oL bash -c                                                    \
+       "set -euxo pipefail;                                           \
+       [ \`${git} name-rev --name-only HEAD\` == \"${branch}\" ];     \
+       [ \`${git} cherry -v | wc -l\` -eq 0 ];                        \
+       ${git} pull --rebase" > $t 2>&1
