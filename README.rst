@@ -19,7 +19,7 @@ simplicity of the webhook handler. The changes to the code are as follows:
  * Added a default configuration file
 
 Please also see the
-`documentation </algorithmics/tdt4120-inginious/blob/master/docs/webhookkonfiguration.md>`_
+`documentation <//github.com/algorithmics/tdt4120-inginious/blob/master/docs/webhookkonfiguration.md>`_
 for our current configuration.
 
 The original README proceeds below:
