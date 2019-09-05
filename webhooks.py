@@ -64,9 +64,7 @@ def index():
             if src_ip in ip_network(valid_ip):
                 break
         else:
-            logging.error('IP {} not allowed'.format(
-                src_ip
-            ))
+            logging.error('IP %s not allowed', src_ip)
             abort(403)
 
     # Enforce secret
@@ -92,7 +90,7 @@ def index():
             # What compare_digest provides is protection against timing
             # attacks; we can live without this protection for a web-based
             # application
-            if not str(mac.hexdigest()) == str(signature):
+            if str(mac.hexdigest()) != str(signature):
                 abort(403)
 
     # Implement ping
@@ -100,21 +98,16 @@ def index():
     if event == 'ping':
         return dumps({'msg': 'pong'})
 
+    # We require requests to be sent with the application/json mime-type
     if not request.is_json:
         abort(415)
 
+    # Gather data. Will raise appropriate 4xx exception if it fails
     payload = request.get_json()
 
+    # Require a payload
     if payload is None:
         abort(400)
-    # Gather data
-    # try:
-
-    #     if payload is None:
-    #         raise Exception
-    # except Exception:
-    #     logging.warning('Request parsing failed')
-    #     abort(400)
 
     # Determining the branch is tricky, as it only appears for certain event
     # types an at different levels
@@ -149,16 +142,15 @@ def index():
         'branch': branch,
         'event': event
     }
-    logging.info('Metadata:\n{}'.format(dumps(meta)))
-
+    logging.info('Metadata:\n%s', dumps(meta))
 
     # Valid payloads contain the 'deleted' key
-    if not 'deleted' in payload:
+    if 'deleted' not in payload:
         abort(400)
 
     # Skip push-delete
     if event == 'push' and payload['deleted']:
-        logging.info('Skipping push-delete event for {}'.format(dumps(meta)))
+        logging.info('Skipping push-delete event for %s', dumps(meta))
         return dumps({'status': 'skipped'})
 
     # Possible hooks
