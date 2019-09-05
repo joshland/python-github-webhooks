@@ -18,6 +18,10 @@ simplicity of the webhook handler. The changes to the code are as follows:
    https://flask.palletsprojects.com/en/1.1.x/deploying/fastcgi/
  * Added a default configuration file
 
+Please also see the
+`documentation </algorithmics/tdt4120-inginious/blob/master/docs/webhookkonfiguration.md>`_
+for our current configuration.
+
 The original README proceeds below:
 
 Simple Python WSGI application to handle GitHub webhooks.
