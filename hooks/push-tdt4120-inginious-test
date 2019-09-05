@@ -1,4 +1,6 @@
 #!/bin/bash
+# -*- coding: utf-8 -*-
+
 set -euo pipefail
 
 # Set the name of the branch that we should keep in sync
@@ -34,9 +36,9 @@ See output below:
 
 EOF
     echo "</pre>" >> $t
-    cat $s $t | mail -c '' -s 'git pull on server failed'             \
-                     -r www-data@bergen.idi.ntnu.no                   \
-                     -a "Cc: truls.asheim@ntnu.no"                    \
+    cat $s $t | mail -s "git pull on server failed"                   \
+                     -r "www-data@bergen.idi.ntnu.no"                 \
+                     -c "truls.asheim@ntnu.no"                        \
                      -a "Content-Type: text/html; charset=\"UTF-8\""  \
                      -- algdat@idi.ntnu.no
 }
