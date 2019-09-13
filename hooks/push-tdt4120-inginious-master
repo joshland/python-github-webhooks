@@ -7,7 +7,7 @@ set -euo pipefail
 branch="master"
 
 # Path to the repository
-repopath="/var/www/repotest/tdt4120-inginious2"
+repopath="/var/www/INGInious/tasks/TDT4120"
 
 s=`mktemp`
 t=`mktemp`
