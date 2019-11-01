@@ -15,9 +15,9 @@
 # specific language governing permissions and limitations
 # under the License.
 
-import logging
+from loguru import logger
 from sys import stderr, hexversion
-logging.basicConfig(stream=stderr)
+logger.basicConfig(stream=stderr)
 
 import hmac
 from hashlib import sha1
@@ -36,6 +36,8 @@ application = Flask(__name__)
 
 
 @application.route('/', methods=['GET', 'POST'])
+@application.route('/github', methods=['GET', 'POST'])
+@application.route('/webhooks', methods=['GET', 'POST'])
 def index():
     """
     Main WSGI application entry.
@@ -55,16 +57,15 @@ def index():
 
     # Allow Github IPs only
     if config.get('github_ips_only', True):
-        src_ip = ip_address(
-            u'{}'.format(request.access_route[0])  # Fix stupid ipaddress issue
-        )
+        real_ip   = request.environ.get('HTTP_X_REAL_IP', request.remote_addr).strip()
+        src_ip    = ip_address(real_ip)
         whitelist = requests.get('https://api.github.com/meta').json()['hooks']
 
         for valid_ip in whitelist:
             if src_ip in ip_network(valid_ip):
                 break
         else:
-            logging.error('IP %s not allowed', src_ip)
+            logger.error('IP %s not allowed', src_ip)
             abort(403)
 
     # Enforce secret
@@ -80,7 +81,7 @@ def index():
             abort(501)
 
         # HMAC requires the key to be bytes, but data is string
-        mac = hmac.new(str(secret), msg=request.data, digestmod='sha1')
+        mac = hmac.new(secret.encode('ascii'), msg=request.data, digestmod='sha1')
 
         # Python prior to 2.7.7 does not have hmac.compare_digest
         if hexversion >= 0x020707F0:
@@ -142,7 +143,7 @@ def index():
         'branch': branch,
         'event': event
     }
-    logging.info('Metadata:\n%s', dumps(meta))
+    logger.info('Metadata:\n%s', dumps(meta))
 
     # Valid payloads contain the 'deleted' key
     if 'deleted' not in payload:
@@ -150,7 +151,7 @@ def index():
 
     # Skip push-delete
     if event == 'push' and payload['deleted']:
-        logging.info('Skipping push-delete event for %s', dumps(meta))
+        logger.info('Skipping push-delete event for %s', dumps(meta))
         return dumps({'status': 'skipped'})
 
     # Possible hooks
@@ -190,7 +191,7 @@ def index():
 
         # Log errors if a hook failed
         if proc.returncode != 0:
-            logging.error('{} : {} \n{}'.format(
+            logger.error('{} : {} \n{}'.format(
                 s, proc.returncode, stderr
             ))
 
@@ -202,9 +203,9 @@ def index():
         return dumps({'status': 'done'})
 
     output = dumps(ran, sort_keys=True, indent=4)
-    logging.info(output)
+    logger.info(output)
     return output
 
 
 if __name__ == '__main__':
-    application.run(debug=True, host='0.0.0.0')
+    application.run(debug=True, host='127.0.0.1', port=5001)
