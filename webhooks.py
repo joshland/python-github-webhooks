@@ -17,7 +17,6 @@
 
 from loguru import logger
 from sys import stderr, hexversion
-logger.basicConfig(stream=stderr)
 
 import hmac
 from hashlib import sha1
@@ -162,6 +161,8 @@ def index():
         scripts.append(join(hooks, '{event}-{name}'.format(**meta)))
     scripts.append(join(hooks, '{event}'.format(**meta)))
     scripts.append(join(hooks, 'all'))
+
+    logger.info(f"Lookup Scripts: {scripts}")
 
     # Check permissions
     scripts = [s for s in scripts if isfile(s) and access(s, X_OK)]

@@ -2,3 +2,4 @@ Flask>=1.1.1
 ipaddress>=1.0.22
 requests>=2.22.0
 flup>=1.0.3
+loguru>=0.3
